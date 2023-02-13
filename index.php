@@ -1,5 +1,5 @@
 <?php
-include 'includes/config.php';
+require 'includes/config.php';
 ?>
 
 <!DOCTYPE html>
@@ -33,7 +33,7 @@ include 'includes/config.php';
               <div class="block__content">
                 <div class="articles articles__horizontal">
                 <?php
-                  $articles = mysqli_query($connection, "SELECT * FROM `articles` ORDER  BY 'id' DESC LIMIT 4");
+                  $articles = mysqli_query($connection, "SELECT * FROM `articles` ORDER BY `articles`.`id` DESC LIMIT 6");
 
                 while( $article = mysqli_fetch_assoc($articles)) {
                   ?>
@@ -67,11 +67,11 @@ include 'includes/config.php';
 
             <div class="block">
               <a href="/articles.php?categorie=2">All posts</a>
-              <h3>Development [New]</h3>
+              <h3>Development</h3>
               <div class="block__content">
                 <div class="articles articles__horizontal">
                     <?php
-                    $articles = mysqli_query($connection, "SELECT * FROM `articles` WHERE `categorie_id` = 2 ORDER  BY 'id' DESC LIMIT 4");
+                    $articles = mysqli_query($connection, "SELECT * FROM `articles` WHERE `categorie_id` = 2 LIMIT 4");
 
                     while( $article = mysqli_fetch_assoc($articles)) {
                         ?>
@@ -82,16 +82,7 @@ include 'includes/config.php';
                                     <?php echo $article['title']?>
                                 </a>
                                 <div class="article__info__meta">
-
-                                    <?php
-                                    $art_cat = false;
-                                    foreach ($categories as $cat) {
-                                        if ($cat['id'] == $article['categorie_id']) {
-                                            $art_cat = $cat;
-                                            break;
-                                        }
-                                    }?>
-                                    <small>Categorie: <a href="/articles.php?categorie=<?php echo $art_cat['id']; ?>"><?php echo $art_cat['categorie_title']; ?></a></small>
+                                    <small>Categorie: <a href="/articles.php?categorie=<?php echo $categories[1]['id']; ?>"><?php echo $categories['1']['categorie_title']; ?></a></small>
                                 </div>
                                 <div class="article__info__preview"><?php echo mb_substr(strip_tags($article['text']), 0, 100, 'utf8') . " ..."?></div>
                             </div>
@@ -109,7 +100,7 @@ include 'includes/config.php';
               <div class="block__content">
                 <div class="articles articles__horizontal">
                     <?php
-                    $articles = mysqli_query($connection, "SELECT * FROM `articles` WHERE `categorie_id` = 4 ORDER  BY 'id' DESC LIMIT 4");
+                    $articles = mysqli_query($connection, "SELECT * FROM `articles` WHERE `categorie_id` = 4 ORDER  BY `articles`.`id` DESC LIMIT 4");
 
                     while( $article = mysqli_fetch_assoc($articles)) {
                         ?>
@@ -120,16 +111,7 @@ include 'includes/config.php';
                                     <?php echo $article['title']?>
                                 </a>
                                 <div class="article__info__meta">
-
-                                    <?php
-                                    $art_cat = false;
-                                    foreach ($categories as $cat) {
-                                        if ($cat['id'] == $article['categorie_id']) {
-                                            $art_cat = $cat;
-                                            break;
-                                        }
-                                    }?>
-                                    <small>Categorie: <a href="/articles.php?categorie=<?php echo $art_cat['id']; ?>"><?php echo $art_cat['categorie_title']; ?></a></small>
+                                    <small>Categorie: <a href="/articles.php?categorie=<?php echo $categories[3]['id']; ?>"><?php echo $categories[3]['categorie_title']; ?></a></small>
                                 </div>
                                 <div class="article__info__preview"><?php echo mb_substr(strip_tags($article['text']), 0, 100, 'utf8') . " ..."?></div>
                             </div>
