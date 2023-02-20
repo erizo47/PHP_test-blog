@@ -33,7 +33,7 @@ require 'includes/config.php';
               <div class="block__content">
                 <div class="articles articles__horizontal">
                 <?php
-                  $articles = mysqli_query($connection, "SELECT * FROM `articles` ORDER BY `articles`.`id` DESC LIMIT 6");
+                  $articles = $mysqli->query("SELECT * FROM `articles` ORDER BY `articles`.`id` DESC LIMIT 6");
 
                 while( $article = mysqli_fetch_assoc($articles)) {
                   ?>
@@ -100,7 +100,7 @@ require 'includes/config.php';
               <div class="block__content">
                 <div class="articles articles__horizontal">
                     <?php
-                    $articles = mysqli_query($connection, "SELECT * FROM `articles` WHERE `categorie_id` = 4 ORDER  BY `articles`.`id` DESC LIMIT 4");
+                    $articles = $mysqli->query("SELECT * FROM `articles` WHERE `categorie_id` = 4 ORDER  BY `articles`.`id` DESC LIMIT 4");
 
                     while( $article = mysqli_fetch_assoc($articles)) {
                         ?>

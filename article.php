@@ -23,10 +23,17 @@ require 'includes/config.php';
 
     <?php include 'includes/header.php' ?>
     <?php
-        $article = mysqli_query($connection, "SELECT * FROM `articles` WHERE `id` = " . (int) $_GET['id']);
-        $art = mysqli_fetch_assoc($article);
-        mysqli_query($connection,"UPDATE `articles` SET `views` = `views` + 1 WHERE `id` =" . (int) $art['id']);
+        $get_id = stripcslashes($_GET['id']);
+        $article = $mysqli->prepare("SELECT * FROM `articles` WHERE `id` = ?");
+        $article->bind_param('i', $get_id);
+        $article->execute();
+        $result = $article->get_result();
+        $art = $result->fetch_assoc();
+
+        $mysqli->query("UPDATE `articles` SET `views` = `views` + 1 WHERE `id` =" . (int) $art['id']);
+
         if (isset($_POST['do_post'])) {
+
         $errors = array();
         if ($_POST['name'] == '') {
             $errors[] = 'Введите Имя';
@@ -41,12 +48,21 @@ require 'includes/config.php';
             $errors[] = 'Введите текст комментария';
         }
         if (empty($errors)) {
-            mysqli_query($connection, "INSERT INTO `comments` (`author`, `nickname`, `email`, `comment`, `articlles_id`) VALUES ('".$_POST['name']."', '".$_POST['nickname']."', '".$_POST['email']."', '".$_POST['text']."', '".$art['id']."')");
+            $post_comment = $mysqli->prepare("INSERT INTO `comments` (`author`, `nickname`, `email`, `comment`, `articlles_id`) VALUES (?, ?, ?, ?, " .$art['id']. ")");
+
+            $comment_name = stripcslashes($_POST['name']);
+            $comment_nickname = stripcslashes($_POST['nickname']);
+            $comment_email = stripcslashes($_POST['email']);
+            $comment_text = stripcslashes($_POST['text']);
+
+            $post_comment->bind_param('ssss', $comment_name, $comment_nickname, $comment_email, $comment_text );
+            $post_comment->execute();
+            unset($_POST['name'], $_POST['nickname'], $_POST['email'], $_POST['text']);
         }
     }
 
 
-        if (mysqli_num_rows($article) <= 0) {
+        if (empty($art)) {
             ?>
             <div id="content">
                 <div class="container">
@@ -55,7 +71,7 @@ require 'includes/config.php';
                             <div class="block">
                                 <h3>Post doesn`t found</h3>
                                 <div class="block__content">
-                                    <img class="content__img" src="../static/images/hz.png">
+                                    <img class="content__img" src="../static/images/hz.png" alt="Не удалось найти пост">
                                 </div>
                             </div>
                         </section>
@@ -78,7 +94,7 @@ require 'includes/config.php';
                                 <h3><?php echo $art['title'] ?></h3>
                                 <a><?php echo $art['views'] ?> views</a>
                                 <div class="block__content">
-                                    <img src="static/images/<?php echo $art['image'] ?>">
+                                    <img src="static/images/<?php echo $art['image'] ?>" alt="<?php echo $art['image'] ?>">
 
                                     <div class="full-text">
                                        <?php echo $art['text']?>
@@ -92,7 +108,7 @@ require 'includes/config.php';
                                 <div class="block__content">
                                     <div class="articles articles__vertical">
                                         <?php
-                                            $comments = mysqli_query($connection, "SELECT * FROM `comments` WHERE `articlles_id` = " . (int) $art['id'] . " ORDER BY `id`");
+                                            $comments = $mysqli->query("SELECT * FROM `comments` WHERE `articlles_id` = " . (int) $art['id'] . " ORDER BY `id`");
                                             if (mysqli_num_rows($comments) <= 0) {
                                                 echo "Никто ещё не добавил комментарий, станьте первым!";
                                             }
@@ -101,7 +117,7 @@ require 'includes/config.php';
                                                     <article class="article">
                                                         <div class="article__image" style="background-image: url(https://www.gravatar.com/avatar/<?php echo md5($comment['email']);?>?s=125);"></div>
                                                         <div class="article__info">
-                                                            <p href="#"><?php echo $comment['author'] . ' ' . $comment['nickname']; ?></p>
+                                                            <p><?php echo $comment['author'] . ' ' . $comment['nickname']; ?></p>
                                                             <div class="article__info__meta">
                                                                 <small><?php echo $art['pubdate']?></small>
                                                             </div>
@@ -120,12 +136,9 @@ require 'includes/config.php';
                                     <form class="form" method="POST" action="/article.php?id=<?php echo $art['id']?>#comment-add-form">
                                         <div class="form__group" >
                                             <?php
-
-                                                    if (!empty($errors)) {
-                                                        echo '<span style="color: red; font-weight: bold; display: block; margin-bottom: 10px;>"' . $errors[0] . '</span>';
-
+                                            if (!empty($errors)) {
+                                                        echo ('<span style="color: red; font-weight: bold; display: block; margin-bottom: 10px;">' . $errors[0] . '</span>') ;
                                                     }
-
                                             ?>
                                             <div class="row">
                                                 <div class="col-md-4">
@@ -140,7 +153,7 @@ require 'includes/config.php';
                                             </div>
                                         </div>
                                         <div class="form__group">
-                                            <textarea name="text" class="form__control" placeholder="Текст комментария ..." value="<?php echo $_POST['text'];?>"></textarea>
+                                            <textarea name="text" class="form__control" placeholder="Текст комментария ..." ><?php echo $_POST['text'];?></textarea>
                                         </div>
                                         <div class="form__group">
                                             <input type="submit" class="form__control" name="do_post" value="Добавить комментарий">

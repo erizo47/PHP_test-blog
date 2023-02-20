@@ -10,5 +10,11 @@ $config = array(
         'name' => 'test_db'
     )
 );
+$mysqli = new mysqli(
+    $config['db']['server'],
+    $config['db']['username'],
+    $config['db']['password'],
+    $config['db']['name']
+);
 
 require "db.php";

@@ -38,13 +38,23 @@ include 'includes/config.php';
                                     $page = (int) $_GET['page'];
                                 }
                                 $offset = ($per_page * $page) - $per_page;
+
                                 if (isset($_GET['categorie'])) {
-                                    $categorie_id = $_GET['categorie'];
-                                    $total_count_cat = mysqli_query($connection, "SELECT COUNT('id') AS `total_count` FROM `articles` WHERE categorie_id = $categorie_id");
-                                    $articles_cat = mysqli_query($connection, "SELECT * FROM `articles` WHERE `categorie_id` = $categorie_id ORDER  BY 'id' DESC LIMIT $offset,$per_page");
-                                    $total_count = mysqli_fetch_assoc($total_count_cat);
+                                    $categorie_id = stripcslashes($_GET['categorie']);
+                                    $total_count_cat = $mysqli->prepare("SELECT COUNT('id') AS `total_count` FROM `articles` WHERE categorie_id = ?");
+                                    $total_count_cat->bind_param('i', $categorie_id);
+                                    $total_count_cat->execute();
+                                    $total_count = $total_count_cat->get_result();
+                                    $total_count = $total_count->fetch_assoc();
                                     $total_count = $total_count['total_count'];
+
                                     $total_pages = ceil($total_count / $per_page);
+
+                                    $articles_cat = $mysqli->prepare( "SELECT * FROM `articles` WHERE categorie_id = ? ORDER  BY 'id' DESC LIMIT ?,$per_page");
+                                    $articles_cat->bind_param('ii', $categorie_id, $offset);
+                                    $articles_cat->execute();
+                                    $articles_cat = $articles_cat->get_result();
+
                                         if (mysqli_num_rows($articles_cat) < 1) {
                                         echo '<h3>Нет статей</h3>
                                               <div class="block__content">
@@ -81,11 +91,14 @@ include 'includes/config.php';
                                         ?>
                                     <?php  }
                                     } else {
-                                        $total_count_q = mysqli_query($connection, "SELECT COUNT('id') AS `total_count` FROM `articles`");
-                                        $articles = mysqli_query($connection, "SELECT * FROM `articles` ORDER BY 'id' DESC LIMIT $offset,$per_page");
+
+                                        $total_count_q = $mysqli->query( "SELECT COUNT('id') AS `total_count` FROM `articles`");
+                                        $articles = $mysqli->query( "SELECT * FROM `articles` ORDER BY 'id' DESC LIMIT $offset,$per_page");
+
                                         $total_count = mysqli_fetch_assoc($total_count_q);
                                         $total_count = $total_count['total_count'];
                                         $total_pages = ceil($total_count / $per_page);
+
                                     if (mysqli_num_rows($articles) < 1) {
                                             echo '<h3>Нет статей</h3>
                                               <div class="block__content">
@@ -141,9 +154,6 @@ include 'includes/config.php';
             </div>
         </div>
     </div>
-
     <?php include 'includes/footer.php' ?>
-</div>
-
 </body>
 </html>
