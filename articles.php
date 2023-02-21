@@ -40,7 +40,7 @@ include 'includes/config.php';
                                 $offset = ($per_page * $page) - $per_page;
 
                                 if (isset($_GET['categorie'])) {
-                                    $categorie_id = stripcslashes($_GET['categorie']);
+                                    $categorie_id = (int) $_GET['categorie'];
                                     $total_count_cat = $mysqli->prepare("SELECT COUNT('id') AS `total_count` FROM `articles` WHERE categorie_id = ?");
                                     $total_count_cat->bind_param('i', $categorie_id);
                                     $total_count_cat->execute();

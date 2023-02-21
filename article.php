@@ -23,7 +23,7 @@ require 'includes/config.php';
 
     <?php include 'includes/header.php' ?>
     <?php
-        $get_id = stripcslashes($_GET['id']);
+        $get_id = (int) $_GET['id'];
         $article = $mysqli->prepare("SELECT * FROM `articles` WHERE `id` = ?");
         $article->bind_param('i', $get_id);
         $article->execute();
@@ -50,10 +50,10 @@ require 'includes/config.php';
         if (empty($errors)) {
             $post_comment = $mysqli->prepare("INSERT INTO `comments` (`author`, `nickname`, `email`, `comment`, `articlles_id`) VALUES (?, ?, ?, ?, " .$art['id']. ")");
 
-            $comment_name = stripcslashes($_POST['name']);
-            $comment_nickname = stripcslashes($_POST['nickname']);
-            $comment_email = stripcslashes($_POST['email']);
-            $comment_text = stripcslashes($_POST['text']);
+            $comment_name = trim($_POST['name']);
+            $comment_nickname = trim($_POST['nickname']);
+            $comment_email = trim($_POST['email']);
+            $comment_text = trim($_POST['text']);
 
             $post_comment->bind_param('ssss', $comment_name, $comment_nickname, $comment_email, $comment_text );
             $post_comment->execute();
@@ -117,11 +117,11 @@ require 'includes/config.php';
                                                     <article class="article">
                                                         <div class="article__image" style="background-image: url(https://www.gravatar.com/avatar/<?php echo md5($comment['email']);?>?s=125);"></div>
                                                         <div class="article__info">
-                                                            <p><?php echo $comment['author'] . ' ' . $comment['nickname']; ?></p>
+                                                            <p><?php echo htmlspecialchars($comment['author']) . ' ' . htmlspecialchars($comment['nickname']); ?></p>
                                                             <div class="article__info__meta">
                                                                 <small><?php echo $art['pubdate']?></small>
                                                             </div>
-                                                            <div class="article__info__preview"><?php echo $comment['comment']; ?></div>
+                                                            <div class="article__info__preview"><?php echo htmlspecialchars($comment['comment']); ?></div>
                                                         </div>
                                                     </article>
                                         <?php
@@ -142,18 +142,18 @@ require 'includes/config.php';
                                             ?>
                                             <div class="row">
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form__control" name="name" placeholder="Имя" value="<?php echo $_POST['name'];?>">
+                                                    <input type="text" class="form__control" name="name" placeholder="Имя" value="<?php echo htmlspecialchars($_POST['name']);?>">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="text" class="form__control" name="nickname" placeholder="Никнейм" value="<?php echo $_POST['nickname'];?>">
+                                                    <input type="text" class="form__control" name="nickname" placeholder="Никнейм" value="<?php echo htmlspecialchars($_POST['nickname']);?>">
                                                 </div>
                                                 <div class="col-md-4">
-                                                    <input type="email" class="form__control" name="email" placeholder="Email" value="<?php echo $_POST['email'];?>">
+                                                    <input type="email" class="form__control" name="email" placeholder="Email" value="<?php echo htmlspecialchars($_POST['email']);?>">
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form__group">
-                                            <textarea name="text" class="form__control" placeholder="Текст комментария ..." ><?php echo $_POST['text'];?></textarea>
+                                            <textarea name="text" class="form__control" placeholder="Текст комментария ..." ><?php echo htmlspecialchars($_POST['text']);?></textarea>
                                         </div>
                                         <div class="form__group">
                                             <input type="submit" class="form__control" name="do_post" value="Добавить комментарий">

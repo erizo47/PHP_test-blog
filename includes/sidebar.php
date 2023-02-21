@@ -51,7 +51,7 @@ require 'config.php';
   <div class="block__content">
     <div class="articles articles__vertical">
         <?php
-        $comments = mysqli_query($connection, "SELECT * FROM `comments` ORDER BY `id` DESC LIMIT 3");
+        $comments = mysqli_query($connection, "SELECT * FROM `comments` ORDER BY `id` DESC LIMIT 4");
         $articles_q = mysqli_query($connection, "SELECT * FROM `articles`");
         $articles = array();
         while ($article = mysqli_fetch_assoc($articles_q)) {
@@ -62,9 +62,9 @@ require 'config.php';
       <article class="article">
         <div class="article__image" style="background-image: url(https://www.gravatar.com/avatar/<?php echo md5($comment['email']);?>?s=125);"></div>
         <div class="article__info">
-          <p href=""><?php echo $comment['author'] . ' ' . $comment['nickname'] ?></p>
+          <p href=""><?php echo htmlspecialchars($comment['author']) . ' ' . htmlspecialchars($comment['nickname']) ?></p>
           <div class="article__info__meta">
-            <small><a href="/article.php?id=<?php echo $comment['articlles_id']; ?>">
+            <small><a href="/article.php?id=<?php echo htmlspecialchars($comment['articlles_id']); ?>">
                     <?php
                     foreach ($articles as $art) {
                         if ($art['id'] == $comment['articlles_id']) {
@@ -75,7 +75,7 @@ require 'config.php';
                     ?>
             </a></small>
           </div>
-          <div class="article__info__preview"><?php echo $comment['comment'] ?></div>
+          <div class="article__info__preview"><?php echo htmlspecialchars($comment['comment']) ?></div>
         </div>
       </article>
     <?php
